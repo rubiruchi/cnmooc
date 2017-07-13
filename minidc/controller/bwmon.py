@@ -143,18 +143,11 @@ class BandwidthMonitor(app_manager.RyuApp):
 
         # [ ADD YOUR CODE HERE ]
         for stat in body:
-            print "start processing stat"
-            print "name of the switch is " + name 
             is_edge_switch = name in self.topo.edgeSwitches.keys()
-            print "is_edge_switch = " + str(is_edge_switch) 
             if stat.port_no in self.topo.ports[name].keys():
-                print "port_no = " + str(stat.port_no)
                 host_or_switch = self.topo.ports[name][stat.port_no]
-                print "host_or_switch = " + str(host_or_switch)
                 if (host_or_switch in self.topo.hosts.keys()) and is_edge_switch:
-                    print "adding bandwidth stat for " + self.topo.hosts[host_or_switch].name 
                     self.bwstats.addHostBwStat(self.topo.hosts[host_or_switch].name, stat.tx_bytes, stat.rx_bytes) 
-            print "end processing stat"
 
         # periodically print tenant bandwidth usage
         self.statsReplied += 1
