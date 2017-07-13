@@ -169,10 +169,29 @@ class StaticPolicy(object):
         #   ("upward").  If a host has multiple VLANs, you can use the first
         #   in the list of VLANs.
         #   (Hint: you can look up the port of a neighboring host using
-        #           topo.ports[edge switch name][host name]
+        #           .ports[edge switch name][host name]
         #   (Hint: to find a the VLAN, use topo.getVlanCore(vlanId))
 
         # [ADD YOUR CODE HERE]
+        for edge in topo.edgeSwitches.values():
+            routingTable[edge.dpid] = []
+            for h in topo.hosts.values():
+                # don't send edge switch's neighbors up to core
+                if h.name in edge.neighbors:
+                    outport = topo.ports[edge.name][h.name]
+                else:
+                    vlan = h.vlans[0]
+                    core_id = topo.getVlanCore(vlan)
+                    print h.name + " assigned to " + core_id
+                    outport = topo.ports[edge.name][core_id]
+
+                routingTable[edge.dpid].append({
+                    'eth_dst' : h.eth,
+                    'output' : [outport],
+                    'priority' : 2,
+                    'type' : 'dst'
+                })
+
 
         return flood.add_arpflood(routingTable, topo)
 
